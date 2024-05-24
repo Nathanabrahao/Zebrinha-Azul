@@ -56,7 +56,6 @@ function App() {
       setWeatherData(weatherData);
       setTrafficData(trafficData);
       
-      // Group geocode points by calculationMethod
       const groupedGeocodePoints = trafficData.resourceSets[0].resources.reduce<{ [key: string]: GeocodePoint[] }>((acc, resource) => {
         resource.geocodePoints.forEach((point) => {
           if (!acc[point.calculationMethod]) {

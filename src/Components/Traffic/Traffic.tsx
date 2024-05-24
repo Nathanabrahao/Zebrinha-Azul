@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import fetchTrafficData from './TrafficAPI';
 
-// Definindo os estilos com styled-components
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -53,7 +52,6 @@ interface TrafficData {
   }[];
 }
 
-// Componente Traffic
 const Traffic: React.FC = () => {
   const [trafficData, setTrafficData] = useState<TrafficData | null>(null);
   const [error, setError] = useState<string | null>(null);
