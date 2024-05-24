@@ -11,3 +11,122 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0;
+  background: linear-gradient(to top, #87CEEB, #00BFFF);
+}
+
+.App-header {
+  width: 100%;
+  max-width: 1200px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  position: fixed;
+  top: 0;
+  background: rgba(255, 255, 255, 0.1);
+  padding-top: 30px; 
+}
+
+.content-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 80px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.search{
+  font-size: 50px;
+}
+
+.search-form {
+  margin-top: 10px;
+}
+
+.City__search {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: #565757;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #292929;
+}
+
+.weather-content,
+.traffic-content {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 45%;
+  text-align: left;
+}
+
+.weather-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.weather-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 10px;
+  width: 50px;
+  height: 50px;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}
+
+.weather__temp {
+  text-align: center;
+  padding-top: 2px;
+  padding-bottom: 10px;
+  font-size: 25px;
+}
+
+.weather__conditions {
+  text-align: center;
+  padding-top: 2px;
+  padding-bottom: 10px;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .content-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .weather-content,
+  .traffic-content {
+    width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+}

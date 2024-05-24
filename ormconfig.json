@@ -1,0 +1,11 @@
+{
+    "type": "mssql",
+    "host": "localhost",
+    "username": "Zebrinha_azul",
+    "password": "password",
+    "database": "Weather",
+    "synchronize": true,
+    "logging": true,
+    "entities": ["src/entity/*.ts"]
+  }
+  
