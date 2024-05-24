@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import fetchTrafficData from './TrafficAPI'; 
+import fetchTrafficData from './TrafficAPI';
 
 // Definindo os estilos com styled-components
 const Container = styled.div`
@@ -36,40 +36,75 @@ const Error = styled.div`
   margin-top: 20px;
 `;
 
+interface GeocodePoint {
+  coordinates: number[];
+  calculationMethod: string;
+}
+
+interface TrafficResource {
+  name: string;
+  trafficCongestion: string;
+  geocodePoints: GeocodePoint[];
+}
+
+interface TrafficData {
+  resourceSets: {
+    resources: TrafficResource[];
+  }[];
+}
+
 // Componente Traffic
 const Traffic: React.FC = () => {
-    const [trafficData, setTrafficData] = useState<any>(null);
-    const [error, setError] = useState<string | null>(null);
+  const [trafficData, setTrafficData] = useState<TrafficData | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchTraffic = async () => {
-            try {
-                const data = await fetchTrafficData(''); 
-                setTrafficData(data);
-            } catch (error) {
-                setError('Failed to fetch traffic data');
-            }
-        };
+  useEffect(() => {
+    const fetchTraffic = async () => {
+      try {
+        const data = await fetchTrafficData('Acre');
+        setTrafficData(data);
+      } catch (error) {
+        setError('Failed to fetch traffic data');
+      }
+    };
 
-        fetchTraffic();
-    }, []);
+    fetchTraffic();
+  }, []);
 
-    if (error) {
-        return <Error>{error}</Error>;
-    }
+  if (error) {
+    return <Error>{error}</Error>;
+  }
 
-    if (!trafficData) {
-        return <div>Loading...</div>;
-    }
+  if (!trafficData) {
+    return <div>Loading...</div>;
+  }
 
-    return (
-        <Container>
-            <Title>Traffic Information</Title>
-            <TrafficInfo>
-                <TrafficItem>Location: {trafficData.resourceSets[0].resources[0].name}</TrafficItem>
-            </TrafficInfo>
-        </Container>
-    );
+  const uniqueGeocodePoints = trafficData.resourceSets[0].resources.reduce<GeocodePoint[]>((acc, resource) => {
+    resource.geocodePoints.forEach((point) => {
+      if (!acc.find((p) => p.coordinates.toString() === point.coordinates.toString())) {
+        acc.push(point);
+      }
+    });
+    return acc;
+  }, []);
+
+  return (
+    <Container>
+      <Title>Traffic Information</Title>
+      <TrafficInfo>
+        {uniqueGeocodePoints.length > 0 ? (
+          uniqueGeocodePoints.map((point, index) => (
+            <TrafficItem key={index}>
+              <p>Coordinates: {point.coordinates.join(', ')}</p>
+              <p>Calculation Method: {point.calculationMethod}</p>
+            </TrafficItem>
+          ))
+        ) : (
+          <TrafficItem>No traffic information available</TrafficItem>
+        )}
+      </TrafficInfo>
+    </Container>
+  );
 };
 
 export default Traffic;

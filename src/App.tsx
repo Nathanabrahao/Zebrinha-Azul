@@ -18,9 +18,15 @@ interface WeatherData {
   [key: string]: any;
 }
 
+interface GeocodePoint {
+  coordinates: number[];
+  calculationMethod: string;
+}
+
 interface TrafficResource {
   name: string;
   trafficCongestion: string;
+  geocodePoints: GeocodePoint[];
   [key: string]: any;
 }
 
@@ -28,13 +34,13 @@ interface TrafficData {
   resourceSets: {
     resources: TrafficResource[];
     [key: string]: any;
-  }[]
+  }[];
 }
-
 
 function App() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [trafficData, setTrafficData] = useState<TrafficData | null>(null);
+  const [groupedGeocodePoints, setGroupedGeocodePoints] = useState<{ [key: string]: GeocodePoint[] }>({});
   const [city, setCity] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
@@ -46,30 +52,41 @@ function App() {
     event.preventDefault();
     try {
       const weatherData: WeatherData = await fetchWeatherData(city);
-      setWeatherData(weatherData);
-  
       const trafficData: TrafficData = await fetchTrafficData(city);
+      setWeatherData(weatherData);
       setTrafficData(trafficData);
-  
+      
+      // Group geocode points by calculationMethod
+      const groupedGeocodePoints = trafficData.resourceSets[0].resources.reduce<{ [key: string]: GeocodePoint[] }>((acc, resource) => {
+        resource.geocodePoints.forEach((point) => {
+          if (!acc[point.calculationMethod]) {
+            acc[point.calculationMethod] = [];
+          }
+          if (!acc[point.calculationMethod].find((p) => p.coordinates.join(',') === point.coordinates.join(','))) {
+            acc[point.calculationMethod].push(point);
+          }
+        });
+        return acc;
+      }, {});
+      
+      setGroupedGeocodePoints(groupedGeocodePoints);
       setError(null);
     } catch (error) {
       setError('Desculpa, não consegui encontrar, tenha certeza que tenha digitado corretamente o nome do Estado');
       setWeatherData(null);
       setTrafficData(null);
+      setGroupedGeocodePoints({});
     }
   };
-
 
   const translateDescription = (description: string): string => {
     return weatherTranslations[description] || description;
   };
 
-
-
   return (
     <div className="App">
       <header className="App-header">
-        <h1 className='search'>Localizar clima e trafégo na Zebrinha Azul</h1>
+        <h1 className='search'>Localizar clima e tráfego na Zebrinha Azul</h1>
         <form onSubmit={handleSearchSubmit} className="search-form">
           <input
             className="City__search"
@@ -100,29 +117,29 @@ function App() {
           )}
         </div>
 
-
-
         <div className="traffic-content">
           {trafficData ? (
             <div className='card__traffic'>
-              <p>O tráfego em: {city} está:</p>
-              {trafficData.resourceSets[0].resources.map((resource, index) => (
-                <div key={index}>
-                  <p>{resource.name}: {resource.trafficCongestion}</p>
-                </div>
-              ))}
+              <p>A localização solicitada em: {city} possui as seguintes coordenadas:</p>
+              {Object.keys(groupedGeocodePoints).length > 0 ? (
+                Object.keys(groupedGeocodePoints).map((method) => (
+                  <div key={method}>
+                    <p>Calculation Method: {method}</p>
+                    {groupedGeocodePoints[method].map((point, index) => (
+                      <p key={index}>Coordinates: {point.coordinates.join(', ')}</p>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                <p>Não há informações de tráfego disponíveis.</p>
+              )}
             </div>
           ) : (
             <p>Loading...</p>
           )}
         </div>
-
-
-
-
       </div>
     </div>
-
   );
 }
 
